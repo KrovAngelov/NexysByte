@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ООО "NexusByte" — Ноутбуки будущего</title>
+    <style>
+        :root {
+            --primary: #00f7ff;
+            --secondary: #ff00d4;
+            --dark: #0a0a12;
+            --light: #ffffff;
+            --accent: #00e6ff;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        #auth-widget {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(10, 10, 18, 0.9);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--primary);
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        #auth-widget a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        #auth-widget a:hover {
+            color: var(--primary);
+        }
+        header {
+            background: linear-gradient(135deg, var(--dark), #121220);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+        .logo-container {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .logo {
+            width: 250px;
+            height: auto;
+            filter: drop-shadow(0 0 10px var(--primary)) drop-shadow(0 0 20px var(--secondary));
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px var(--primary)) drop-shadow(0 0 20px var(--secondary)); }
+            to { filter: drop-shadow(0 0 20px var(--primary)) drop-shadow(0 0 30px var(--secondary)); }
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        .slogan {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        /* НОВЫЕ СТИЛИ ДЛЯ USER-WIDGET */
+        .user-widget {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(10, 10, 18, 0.9);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--primary);
+            z-index: 999;
+            display: none;
+        }
+        .user-widget .avatar {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .user-widget .avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            background: #333; /* Серый фон */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666; /* Цвет иконки */
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .user-widget #user-display {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        /* НОВОЕ МЕНЮ В ШАПКЕ */
+        .header-menu {
+            background: var(--dark);
+            padding: 0.8rem 1rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .header-menu .logo-small {
+            width: 120px;
+            height: auto;
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
+        .header-menu .nav-links {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .header-menu a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .header-menu a:hover {
+            color: var(--accent);
+            background: rgba(0, 255, 255, 0.1);
+        }
+        .header-menu .location {
+            color: var(--accent);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .header-menu .location::before {
+            content: "📍";
+            font-size: 1.1rem;
+        }
+        #cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .cart-content {
+            background: var(--dark);
+            color: var(--light);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            position: relative;
+        }
+        .cart-content h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .cart-total {
+            margin-top: 1rem;
+            text-align: right;
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .close-cart {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .delivery-form {
+            margin-top: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: white;
+            border-radius: 4px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            margin-top: 0.5rem;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+        }
+        /* Дополнительный стиль для кнопок форм */
+        .form-button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            margin-top: 0.5rem;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+        .form-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+        }
+        #profile-page {
+            display: none;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .profile-header {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            text-align: center;
+            position: relative;
+        }
+        .back-to-catalog {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 255, 255, 0.2);
+            color: var(--accent);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 0;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 2rem;
+        }
+        .avatar-upload {
+            margin-top: 0.5rem;
+            background: rgba(0, 255, 255, 0.2);
+            color: var(--accent);
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        #avatar-input {
+            display: none;
+        }
+        #user-display-profile {
+            display: block;
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        .profile-settings {
+            background: rgba(10, 10, 18, 0.6);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .profile-settings h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .profile-settings .form-group {
+            margin-bottom: 1rem;
+        }
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .order-item {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            position: relative;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .order-details {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+        .cancel-order-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            width: auto;
+        }
+        .logout-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .cart-preview {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .cart-preview h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        .cart-preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .cart-preview-total {
+            margin-top: 0.5rem;
+            text-align: right;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        #login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-content {
+            background: var(--dark);
+            color: var(--light);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            position: relative;
+        }
+        .login-content h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .forgot-password {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: block;
+            text-align: center;
+        }
+        .forgot-password:hover {
+            color: var(--primary);
+        }
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--accent);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #recovery-modal,
+        #change-password-modal,
+        #support-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .recovery-content,
+        .change-password-content,
+        .support-content {
+            background: var(--dark);
+            color: var(--light);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            position: relative;
+        }
+        .recovery-content h3,
+        .change-password-content h3,
+        .support-content h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .recovery-message,
+        .support-message {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .support-btn {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .product-card {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.2);
+        }
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        .product-specs {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.8rem;
+        }
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+        /* УБРАНЫ .reviews-section, .review, .review-author из .product-card */
+        .no-reviews {
+            text-align: center;
+            opacity: 0.7;
+            margin: 2rem 0;
+        }
+        /* СТИЛИ ДЛЯ РАЗДЕЛА О НАС */
+        .about-section {
+            background: rgba(10, 10, 18, 0.6);
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .feature-card {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .feature-card h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .faq-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-between;
+        }
+        .faq-column {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        .faq-item {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-item h4 {
+            color: var(--accent);
+            margin: 0;
+            flex: 1;
+        }
+        .faq-item .toggle {
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .faq-item.active .toggle {
+            background: var(--accent);
+            color: var(--dark);
+        }
+        .faq-answer {
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .ask-question-btn {
+            display: block;
+            width: 100%;
+            margin: 2rem auto 1rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 30px;
+            color: var(--accent);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .ask-question-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        .question-form {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 10px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            margin-top: 1rem;
+            display: none;
+        }
+        .question-form h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .question-form p {
+            text-align: center;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        .question-form .form-group {
+            margin-bottom: 1rem;
+        }
+        .question-form .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+        .question-form input,
+        .question-form textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: white;
+            border-radius: 4px;
+        }
+        .question-form .btn {
+            background: linear-gradient(to right, #ff6b6b, #ff416c);
+            color: var(--dark);
+            width: 100%;
+            margin-top: 1rem;
+        }
+        /* СТИЛИ ДЛЯ ОТЗЫВОВ */
+        .reviews-section-all {
+            margin-top: 2rem;
+        }
+        .review-item {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .review-author {
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .review-product {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            margin-left: 0.5rem;
+        }
+        .review-text {
+            margin-top: 0.5rem;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        /* НОВЫЕ СТИЛИ ДЛЯ СЕКЦИИ ДОКУМЕНТАЦИИ */
+        #documentation {
+            display: none;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .documentation-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        .back-to-main {
+            background: rgba(0, 255, 255, 0.2);
+            color: var(--accent);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .documentation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .documentation-table th,
+        .documentation-table td {
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .documentation-table th {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: var(--accent);
+        }
+        /* Стиль для штатного расписания */
+        .staff-schedule {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .staff-schedule th,
+        .staff-schedule td {
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .staff-schedule th {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: var(--accent);
+        }
+        .staff-schedule .total-row {
+            font-weight: bold;
+            background-color: rgba(0, 255, 255, 0.05);
+            border-top: 2px solid var(--primary);
+        }
+        .staff-schedule .signature {
+            text-align: right;
+            font-style: italic;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .header-menu .nav-links {
+                gap: 0.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-menu .location {
+                order: -1;
+                font-size: 0.85rem;
+            }
+            .header-menu .logo-small {
+                width: 100px;
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            #auth-widget {
+                top: 10px;
+                left: 10px;
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+            .user-widget {
+                gap: 6px;
+                padding: 4px 8px;
+            }
+            .user-widget .avatar {
+                width: 28px;
+                height: 28px;
+            }
+            .user-widget #user-display {
+                font-size: 0.8rem;
+            }
+            .user-widget .avatar-placeholder {
+                width: 28px;
+                height: 28px;
+                font-size: 1rem;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .faq-column {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-widget">
+        <a href="#" id="open-login">Вход / Регистрация</a>
+    </div>
+    <header>
+        <div class="logo-container">
+            <img src="https://i.postimg.cc/NFVwvmWN/1760697197.png" alt='Логотип ООО "NexusByte"' class="logo">
+            <!-- НОВЫЙ КОНТЕЙНЕР ДЛЯ АВАТАРА И НИКА -->
+            <div class="user-widget">
+                <img id="user-avatar" class="avatar" src="" alt="Аватар" style="display: none;">
+                <div id="avatar-placeholder" class="avatar-placeholder">👤</div>
+                <span id="user-display"></span>
+            </div>
+        </div>
+        <h1>ООО "NexusByte"</h1>
+        <p class="slogan">Технологии будущего — уже сегодня</p>
+        <!-- НОВОЕ МЕНЮ В ШАПКЕ -->
+        <div class="header-menu">
+            <a href="#home"><img src="https://i.postimg.cc/bJ7b8Kg1/2025-10-18-170743194.png" alt="Логотип" class="logo-small"></a>
+            <div class="nav-links">
+                <a href="#catalog">Ноутбуки</a>
+                <a href="#catalog">Каталог</a>
+                <a href="#documentation">Документация</a> <!-- Новая ссылка -->
+                <a href="#about">О нас</a>
+                <a href="#about">Услуги</a>
+                <a href="#" id="open-support">Поддержка</a>
+                <a href="#about">Компания</a>
+            </div>
+            <!-- КОРЗИНА ПЕРЕНЕСЕНА СЮДА -->
+            <div style="font-size: 1.5rem; cursor: pointer;" id="cart-trigger">🛒</div>
+            <div class="location">Москва</div>
+        </div>
+    </header>
+    <!-- Модальные окна -->
+    <div id="cart-modal" class="modal">
+        <div class="cart-content">
+            <button class="close-cart" id="close-cart">&times;</button>
+            <h3>Ваша корзина</h3>
+            <div id="cart-items">Корзина пуста</div>
+            <div class="cart-total">Итого: ₽0</div>
+            <div class="delivery-form">
+                <div class="form-group">
+                    <label for="delivery-address">Адрес доставки</label>
+                    <input type="text" id="delivery-address" placeholder="г. Москва, ул. Ленина, д. 10, кв. 5" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone-number">Номер телефона для связи</label>
+                    <input type="tel" id="phone-number" placeholder="+7 (999) 123-45-67" required>
+                </div>
+                <div class="form-group">
+                    <label for="pickup-point">Пункт выдачи (можно вписать свой)</label>
+                    <input type="text" id="pickup-point" placeholder="Москва, Центральный (ул. Тверская, 1)" required>
+                </div>
+            </div>
+            <button id="checkout-btn" class="btn" style="display:none;">Перейти к оплате</button>
+        </div>
+    </div>
+    <div id="login-modal">
+        <div class="login-content">
+            <button class="close-cart" id="close-login">&times;</button>
+            <h3 id="auth-title">Вход в личный кабинет</h3>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="auth-username">Логин</label>
+                    <input type="text" id="auth-username" placeholder="Введите ваш логин" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Пароль</label>
+                    <input type="password" id="auth-password" placeholder="Введите пароль" required minlength="6">
+                </div>
+                <button type="submit" class="btn" id="auth-submit-btn">Войти</button>
+                <a href="#" class="forgot-password" id="show-recovery">Забыли пароль?</a>
+            </form>
+            <div class="auth-toggle" id="toggle-auth-mode">
+                Нет аккаунта? Зарегистрироваться
+            </div>
+        </div>
+    </div>
+    <div id="recovery-modal">
+        <div class="recovery-content">
+            <button class="close-cart" id="close-recovery">&times;</button>
+            <h3>Восстановление пароля</h3>
+            <form id="recovery-form">
+                <div class="form-group">
+                    <label for="recovery-username">Ваш логин</label>
+                    <input type="text" id="recovery-username" placeholder="Введите ваш логин" required minlength="3">
+                </div>
+                <button type="submit" class="btn">Получить временный пароль</button>
+            </form>
+            <div id="recovery-result" class="recovery-message" style="display: none;"></div>
+        </div>
+    </div>
+    <div id="change-password-modal">
+        <div class="change-password-content">
+            <button class="close-cart" id="close-change-password">&times;</button>
+            <h3>Изменение пароля</h3>
+            <form id="change-password-form">
+                <div class="form-group">
+                    <label for="current-password">Текущий пароль</label>
+                    <input type="password" id="current-password" placeholder="Введите текущий пароль" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Новый пароль</label>
+                    <input type="password" id="new-password" placeholder="Введите новый пароль" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Подтвердите пароль</label>
+                    <input type="password" id="confirm-password" placeholder="Подтвердите новый пароль" required>
+                </div>
+                <button type="submit" class="btn">Изменить пароль</button>
+            </form>
+        </div>
+    </div>
+    <div id="support-modal">
+        <div class="support-content">
+            <button class="close-cart" id="close-support">&times;</button>
+            <h3>Обратиться в техническую поддержку</h3>
+            <form id="support-form">
+                <div class="form-group">
+                    <label for="support-name">Ваше имя *</label>
+                    <input type="text" id="support-name" placeholder="Введите ваше имя" required minlength="2">
+                </div>
+                <div class="form-group">
+                    <label for="support-email">Email *</label>
+                    <input type="email" id="support-email" placeholder="Ваш email для обратной связи" required>
+                </div>
+                <div class="form-group">
+                    <label for="support-phone">Телефон *</label>
+                    <input type="tel" id="support-phone" placeholder="+7 (999) 123-45-67" required>
+                </div>
+                <div class="form-group">
+                    <label for="support-message">Сообщение *</label>
+                    <textarea id="support-message" rows="5" placeholder="Опишите вашу проблему или вопрос" required minlength="10"></textarea>
+                </div>
+                <button type="submit" class="btn support-btn">Отправить в техподдержку</button>
+            </form>
+            <div id="support-result" class="support-message" style="display: none;"></div>
+        </div>
+    </div>
+    <!-- Личный кабинет -->
+    <div id="profile-page">
+        <div class="profile-header">
+            <button class="back-to-catalog" id="back-to-catalog">← Каталог</button>
+            <div class="avatar-container">
+                <img id="profile-avatar" class="profile-avatar" src="" alt="Аватар">
+                <button class="avatar-upload" id="change-avatar-btn">Изменить аватар</button>
+                <input type="file" id="avatar-input" accept="image/*">
+            </div>
+            <div id="user-display-profile"></div>
+            <p>Управление вашими заказами и профилем</p>
+        </div>
+        <div class="profile-settings">
+            <h3>Настройки профиля</h3>
+            <div class="form-group">
+                <label for="profile-phone">Номер телефона</label>
+                <input type="tel" id="profile-phone" placeholder="+7 (999) 123-45-67">
+            </div>
+            <div class="form-group">
+                <label for="profile-address">Адрес доставки</label>
+                <input type="text" id="profile-address" placeholder="г. Москва, ул. Ленина, д. 10, кв. 5">
+            </div>
+            <div class="form-group">
+                <label for="profile-pickup">Пункт выдачи (можно вписать свой)</label>
+                <input type="text" id="profile-pickup" placeholder="Москва, Центральный (ул. Тверская, 1)">
+            </div>
+            <button id="save-profile-btn" class="btn">Сохранить настройки</button>
+        </div>
+        <div class="cart-preview">
+            <h3>Ваша корзина</h3>
+            <div id="cart-preview-items">Корзина пуста</div>
+            <div class="cart-preview-total">Итого: ₽0</div>
+            <button id="go-to-checkout" class="btn" style="margin-top: 1rem;">Оформить заказ</button>
+        </div>
+        <div class="order-list" id="paid-orders"></div>
+        <button id="change-password-btn" class="btn" style="margin-top: 1rem;">Изменить пароль</button>
+        <button id="logout-btn" class="btn logout-btn">Выйти</button>
+    </div>
+    <!-- НОВАЯ СЕКЦИЯ ДОКУМЕНТАЦИИ -->
+    <div id="documentation">
+        <div class="documentation-header">
+            <h2>Документация</h2>
+            <button class="back-to-main" id="back-to-main">← Каталог</button>
+        </div>
+        <h3>Трудовой договор</h3>
+        <table class="documentation-table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>ФИО</th>
+                    <th>Должность</th>
+                    <th>Тип договора</th>
+                    <th>Дата приёма</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Царапкин Альфа Викторович</td>
+                    <td>Генеральный директор</td>
+                    <td>Бессрочный</td>
+                    <td>15.04.2025</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Иванова Анна Сергеевна</td>
+                    <td>Менеджер по продажам</td>
+                    <td>Бессрочный</td>
+                    <td>05.05.2025</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Петров Дмитрий Алексеевич</td>
+                    <td>Специалист техподдержки</td>
+                    <td>Бессрочный</td>
+                    <td>06.05.2025</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Соколова Елена Олеговна</td>
+                    <td>Контент-менеджер</td>
+                    <td>Бессрочный</td>
+                    <td>07.05.2025</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Кузнецов Игорь Романович</td>
+                    <td>Курьер</td>
+                    <td>Бессрочный</td>
+                    <td>08.05.2025</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 style="margin-top: 2rem;">Штатное расписание</h3>
+        <table class="staff-schedule">
+            <thead>
+                <tr>
+                    <th rowspan="2">Наименование подразделения</th>
+                    <th rowspan="2">Должность</th>
+                    <th rowspan="2">ед.</th>
+                    <th colspan="2">Оклад (руб)</th>
+                </tr>
+                <tr>
+                    <th>Ставка</th>
+                    <th>Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">Администрация</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Генеральный директор</td>
+                    <td>1</td>
+                    <td>80 000</td>
+                    <td>80 000</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Отдел продаж</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Менеджер по продажам</td>
+                    <td>1</td>
+                    <td>50 000</td>
+                    <td>50 000</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Техническая поддержка</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Специалист техподдержки</td>
+                    <td>1</td>
+                    <td>45 000</td>
+                    <td>45 000</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="2">ИТОГО</td>
+                    <td>3</td>
+                    <td></td>
+                    <td>175 000</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="signature">
+            Генеральный директор<br>
+            ____________________ /Царапкин А.В./<br>
+            «10» октября 2025 г.
+        </div>
+    </div>
+    <main id="main-content">
+        <section id="catalog">
+            <h2>Популярные модели (24 ноутбука)</h2>
+            <div class="products-grid" id="products-container"></div>
+        </section>
+        <section id="reviews">
+            <h2>Все отзывы покупателей</h2>
+            <div id="all-reviews-container"></div>
+            <!-- Форма "Оставить отзыв" внизу раздела -->
+            <div class="reviews-section-all">
+                <h3 style="color: var(--accent); margin-top: 2rem;">Оставить отзыв о сайте</h3>
+                <form class="review-form-all" id="global-review-form">
+                    <div class="form-group">
+                        <label for="review-author-global">Ваше имя *</label>
+                        <input type="text" id="review-author-global" placeholder="Введите ваше имя" required minlength="2">
+                    </div>
+                    <div class="form-group">
+                        <label for="review-text-global">Ваш отзыв *</label>
+                        <textarea id="review-text-global" rows="4" placeholder="Опишите ваш опыт на сайте" required minlength="10"></textarea>
+                    </div>
+                    <button type="submit" class="form-button">Отправить отзыв</button>
+                </form>
+            </div>
+        </section>
+        <section id="about">
+            <h2 style="text-align: center; margin-bottom: 1.5rem; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent;">О нас</h2>
+            <div class="about-section">
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>Комплектующие в наличии</h3>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Гарантия до 3х лет</h3>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Тестируем сборки перед отправкой</h3>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Гарантийная доставка за наш счёт</h3>
+                    </div>
+                </div>
+                <div class="faq-section">
+                    <div class="faq-column">
+                        <div class="faq-item">
+                            <h4>Подробнее про гарантию</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Мы предоставляем расширенную гарантию на все наши ноутбуки сроком до 3 лет. Гарантия покрывает любые производственные дефекты. Для получения гарантийного обслуживания достаточно обратиться в нашу службу поддержки.
+                        </div>
+                        <div class="faq-item">
+                            <h4>Есть ли у нас рассрочка?</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Да, мы предлагаем рассрочку без переплат на 2-3 месяца для всех наших клиентов. Подробности уточняйте у менеджера при оформлении заказа.
+                        </div>
+                        <div class="faq-item">
+                            <h4>Оригинальные ли у нас комплектующие?</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Все комплектующие, используемые в наших ноутбуках, являются оригинальными и поставляются напрямую от официальных дистрибьюторов. Мы не используем б/у или неоригинальные детали.
+                        </div>
+                        <div class="faq-item">
+                            <h4>Можно ли менять комплектующие в сборке?</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Да, вы можете выбрать любые комплектующие из нашего каталога. Наши инженеры соберут ноутбук именно под ваши требования. Просто сообщите нам, что вам нужно.
+                        </div>
+                    </div>
+                    <div class="faq-column">
+                        <div class="faq-item">
+                            <h4>Подробнее о доставке</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Мы сотрудничаем с надежными транспортными компаниями. Доставка осуществляется по всей России. Сроки доставки зависят от вашего региона.
+                        </div>
+                        <div class="faq-item">
+                            <h4>Условия бесплатной доставки</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Бесплатная доставка предоставляется на заказы от 50 000 рублей. Для заказов меньше этой суммы стоимость доставки рассчитывается индивидуально.
+                        </div>
+                        <div class="faq-item">
+                            <h4>Апгрейд</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Мы предлагаем услуги апгрейда для уже купленных ноутбуков. Вы можете увеличить объем оперативной памяти, заменить жесткий диск на SSD или установить более мощный процессор.
+                        </div>
+                        <div class="faq-item">
+                            <h4>Сроки сборки и отправки</h4>
+                            <div class="toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Сборка ноутбука занимает от 1 до 3 рабочих дней. После сборки и тестирования мы сразу же отправляем его вам. Общее время от заказа до получения — от 2 до 7 дней.
+                        </div>
+                    </div>
+                </div>
+                <button class="ask-question-btn" id="ask-question-btn">ЗАДАТЬ СВОЙ ВОПРОС</button>
+                <div class="question-form" id="question-form">
+                    <h3>Онлайн расчет за 5 минут</h3>
+                    <p>Укажите контактный email, на который наш менеджер сможет вам перезвонить</p>
+                    <div class="form-group">
+                        <label for="question-name">Имя</label>
+                        <input type="text" id="question-name" placeholder="Ваше имя" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="question-email">Email</label>
+                        <input type="email" id="question-email" placeholder="Ваш email" required>
+                    </div>
+                    <button type="submit" class="btn">Отправить заявку</button>
+                </div>
+            </div>
+        </section>
+        <section id="contacts" style="margin-top: 3rem;">
+            <h2 style="text-align: center; margin-bottom: 1.5rem; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent;">Свяжитесь с нами</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start;">
+                <div style="flex: 1; min-width: 300px; background: rgba(10, 10, 18, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 16px; padding: 2rem; box-shadow: 0 8px 20px rgba(0, 255, 255, 0.1);">
+                    <h3 style="color: var(--accent); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem;">
+                        <span>📞</span> Контактная информация
+                    </h3>
+                    <p style="margin: 0.8rem 0; display: flex; align-items: center; gap: 0.6rem;">
+                        <span>📍</span> г. Москва, ул. Технопарковая, д. 10
+                    </p>
+                    <p style="margin: 0.8rem 0; display: flex; align-items: center; gap: 0.6rem;">
+                        <span>📱</span> +79959079760 (Константин)
+                    </p>
+                    <p style="margin: 0.8rem 0; display: flex; align-items: center; gap: 0.6rem;">
+                        <span>✉️</span> krovangelov@bk.ru
+                    </p>
+                    <p style="margin: 0.8rem 0; display: flex; align-items: center; gap: 0.6rem;">
+                        <span>🕒</span> Пн–Пт: 9:00–18:00
+                    </p>
+                </div>
+                <div style="flex: 1; min-width: 300px; background: rgba(10, 10, 18, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 16px; padding: 2rem; box-shadow: 0 8px 20px rgba(0, 255, 255, 0.1);">
+                    <h3 style="color: var(--accent); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem;">
+                        <span>💬</span> Напишите нам
+                    </h3>
+                    <form class="contact-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <input type="text" placeholder="Ваше имя *" required style="padding: 0.75rem; background: rgba(20, 20, 30, 0.7); border: 1px solid rgba(0, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 1rem;">
+                        <input type="email" placeholder="Email *" required style="padding: 0.75rem; background: rgba(20, 20, 30, 0.7); border: 1px solid rgba(0, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 1rem;">
+                        <input type="tel" placeholder="Телефон" style="padding: 0.75rem; background: rgba(20, 20, 30, 0.7); border: 1px solid rgba(0, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 1rem;">
+                        <textarea rows="4" placeholder="Сообщение *" required style="padding: 0.75rem; background: rgba(20, 20, 30, 0.7); border: 1px solid rgba(0, 255, 255, 0.3); color: white; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+                        <button type="submit" class="btn" style="width: 100%;">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 ООО "NexusByte". Все права защищены.</p>
+        <div class="social-links">
+            <a href="#">📱 VK</a>
+            <a href="#">📘 Telegram</a>
+            <a href="#">🐦 Twitter</a>
+            <a href="#">📸 Instagram</a>
+        </div>
+        <p>Продажа ноутбуков с доставкой по всей России</p>
+    </footer>
+    <script>
+        // Добавляем изображения для конкретных ноутбуков
+        const laptopImages = {
+            "NexusByte Slim V3": "https://i.postimg.cc/fbZwGBt9/1762775997-1.png",
+            "NexusByte Rugged R1": "https://i.postimg.cc/QC5NLPbP/1762776165.png",
+            "NexusByte Touch T5": "https://i.postimg.cc/3R0Yp6PY/1762776242.png",
+            "NexusByte Budget B2": "https://i.postimg.cc/28ZLm96J/1762779348.png",
+            "NexusByte Elite E9": "https://i.postimg.cc/fy0yzkw9/1762779396.png",
+            "NexusByte Convertible K4": "https://i.postimg.cc/CKLjFC95/1762779440.png",
+            "NexusByte Business B7": "https://i.postimg.cc/jdHNPkbH/1762779591.png",
+            "NexusByte Gaming G5": "https://i.postimg.cc/Fs4krgL4/1762779634.png",
+            "NexusByte Chrome C1": "https://i.postimg.cc/0Q4GX6WY/1762780143.png"
+        };
+        const laptops = [
+            { id: 1, name: "NexusByte Pro X1", specs: "Intel Core i7, 16GB RAM, 512GB SSD, 15.6\" FullHD", price: 89990, customImage: "https://i.postimg.cc/hjDH6p3d/2025-10-17-135446468.png" },
+            { id: 2, name: "NexusByte UltraBook M2", specs: "AMD Ryzen 9, 32GB RAM, 1TB NVMe, 14\" OLED", price: 129990, customImage: "https://i.postimg.cc/BQKwhrQy/2025-10-17-135607685.png" },
+            { id: 3, name: "NexusByte Gamer Z9", specs: "RTX 4070, Intel i9, 64GB RAM, 17.3\" 144Hz", price: 189990, customImage: "https://i.postimg.cc/K8ncypQM/2025-10-17-140301662.png" },
+            { id: 4, name: "NexusByte Mini S1", specs: "Intel Core i5, 8GB RAM, 256GB SSD, 13.3\" IPS", price: 49990, customImage: "https://i.postimg.cc/sDzwcw1Q/2025-10-17-142016815.png" },
+            { id: 5, name: "NexusByte Air Lite", specs: "M2 Chip, 16GB RAM, 512GB SSD, 13.6\" Retina", price: 119990, customImage: "https://i.postimg.cc/MTPfQZc0/2025-10-17-143139701.png" },
+            { id: 6, name: "NexusByte Workstation T7", specs: "Xeon W-11955M, 64GB ECC, 2TB SSD, 17\" 4K", price: 299990, customImage: "https://i.postimg.cc/2yYjyPGK/2025-10-17-143431534.png" },
+            { id: 7, name: "NexusByte Student E5", specs: "Intel Core i3, 8GB RAM, 256GB SSD, 14\" HD", price: 34990, customImage: "https://i.postimg.cc/mk3YFWss/2025-10-17-143936011.png" },
+            { id: 8, name: "NexusByte Creator C8", specs: "RTX 4080, i7-13700H, 32GB RAM, 16\" QHD+", price: 199990, customImage: "https://i.postimg.cc/gjcJ4ChL/2025-10-17-144059707.png" },
+            { id: 9, name: "NexusByte Slim V3", specs: "Ryzen 7 7840U, 16GB RAM, 1TB SSD, 14\" 2.8K", price: 94990, imgId: 109 },
+            { id: 10, name: "NexusByte Rugged R1", specs: "Intel i5, 16GB RAM, 512GB SSD, MIL-STD-810H", price: 109990, imgId: 110 },
+            { id: 11, name: "NexusByte Touch T5", specs: "i7-1360P, 16GB RAM, 512GB SSD, 13.5\" Touch", price: 104990, imgId: 111 },
+            { id: 12, name: "NexusByte Budget B2", specs: "Celeron N5105, 8GB RAM, 128GB eMMC, 15.6\"", price: 24990, imgId: 112 },
+            { id: 13, name: "NexusByte Elite E9", specs: "i9-13900HX, 64GB RAM, 2TB SSD, RTX 4090", price: 349990, imgId: 113 },
+            { id: 14, name: "NexusByte Convertible K4", specs: "Ryzen 5 7535U, 16GB RAM, 512GB SSD, 14\" 360°", price: 79990, imgId: 114 },
+            { id: 15, name: "NexusByte Business B7", specs: "i7-1365U, 16GB RAM, 1TB SSD, Fingerprint", price: 99990, imgId: 115 },
+            { id: 16, name: "NexusByte Gaming G5", specs: "RTX 4060, i5-13500H, 16GB RAM, 15.6\" 165Hz", price: 114990, imgId: 116 },
+            { id: 17, name: "NexusByte Chrome C1", specs: "Intel N100, 8GB RAM, 128GB SSD, ChromeOS", price: 29990, imgId: 117 },
+            { id: 18, name: "NexusByte DualScreen D2", specs: "i7-13700H, 32GB RAM, 1TB SSD, Secondary 12.5\"", price: 179990, imgId: 118 },
+            { id: 19, name: "NexusByte LongLife L3", specs: "Ryzen 7 7735U, 16GB RAM, 1TB SSD, 20h Battery", price: 89990, imgId: 119 },
+            { id: 20, name: "NexusByte Studio S7", specs: "RTX 4070, i9-13900H, 64GB RAM, 17\" Mini-LED", price: 259990, imgId: 120 },
+            { id: 21, name: "NexusByte Nano N1", specs: "Snapdragon X Elite, 16GB RAM, 512GB SSD, 13\"", price: 124990, imgId: 121 },
+            { id: 22, name: "NexusByte Edu E3", specs: "Intel N200, 8GB RAM, 256GB SSD, Education OS", price: 26990, imgId: 122 },
+            { id: 23, name: "NexusByte Max M9", specs: "i9-13980HX, 128GB RAM, 4TB SSD, RTX 4090", price: 449990, imgId: 123 },
+            { id: 24, name: "NexusByte Flex F6", specs: "Ryzen 9 7940HS, 32GB RAM, 2TB SSD, 16\" OLED", price: 169990, imgId: 124 }
+        ];
+        let cart = JSON.parse(localStorage.getItem('nexusbyte_cart')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('nexusbyte_user')) || null;
+        let isRegisterMode = false;
+        function saveCart() {
+            localStorage.setItem('nexusbyte_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-trigger').innerHTML = count > 0 ? `🛒<span style="color:var(--secondary); font-weight:bold; margin-left:4px;">${count}</span>` : '🛒';
+        }
+        function renderCartModal() {
+            const modalItems = document.getElementById('cart-items');
+            const totalEl = document.querySelector('.cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (cart.length === 0) {
+                modalItems.innerHTML = '<p>Корзина пуста</p>';
+                totalEl.textContent = 'Итого: ₽0';
+                checkoutBtn.style.display = 'none';
+                return;
+            }
+            let html = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                html += `
+                    <div class="cart-item">
+                        <div>
+                            <div>${item.name}</div>
+                            <div style="font-size:0.9rem; color:#aaa;">${item.quantity} × ₽${item.price.toLocaleString('ru-RU')}</div>
+                        </div>
+                        <div>
+                            <div>₽${itemTotal.toLocaleString('ru-RU')}</div>
+                            <button class="btn-remove" data-index="${index}" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-size:0.9rem; margin-top:4px;">Удалить</button>
+                        </div>
+                    </div>
+                `;
+            });
+            modalItems.innerHTML = html;
+            totalEl.textContent = `Итого: ₽${total.toLocaleString('ru-RU')}`;
+            checkoutBtn.style.display = 'block';
+        }
+        function loadReviews() {
+            const saved = localStorage.getItem('nexusbyte_reviews');
+            return saved ? JSON.parse(saved) : {};
+        }
+        function saveReviews(reviews) {
+            localStorage.setItem('nexusbyte_reviews', JSON.stringify(reviews));
+        }
+        function renderLaptop(laptop) {
+            // Убраны отзывы и форма из карточки
+            let imageUrl = laptopImages[laptop.name] || laptop.customImage || `https://picsum.photos/seed/nb${laptop.imgId}/280/180`;
+            if (imageUrl.includes('picsum.photos') && !laptop.imgId) {
+                 // Если не задан imgId и используется генерируемое изображение, используем id
+                imageUrl = `https://picsum.photos/seed/nb${laptop.id}/280/180`;
+            }
+            return `
+                <div class="product-card">
+                    <img src="${imageUrl}" alt="${laptop.name}" class="product-image">
+                    <h3 class="product-title">${laptop.name}</h3>
+                    <p class="product-specs">${laptop.specs}</p>
+                    <div class="product-price">₽${laptop.price.toLocaleString('ru-RU')}</div>
+                    <button class="btn add-to-cart" data-id="${laptop.id}">Купить</button>
+                </div>
+            `;
+        }
+        function renderAllReviews() {
+            const reviews = loadReviews();
+            const container = document.getElementById('all-reviews-container');
+            let allReviewsHTML = '';
+            let hasAny = false;
+            for (const laptopId in reviews) {
+                const laptop = laptops.find(l => l.id == laptopId);
+                if (!laptop) continue;
+                reviews[laptopId].forEach(r => {
+                    hasAny = true;
+                    allReviewsHTML += `
+                        <div class="review-item">
+                            <span class="review-author">${r.author}</span>
+                            <span class="review-product">→ ${laptop.name}</span>
+                            <p class="review-text">${r.text}</p>
+                        </div>
+                    `;
+                });
+            }
+            // Явно переназначаем innerHTML, чтобы обновить отображение
+            container.innerHTML = hasAny 
+                ? allReviewsHTML 
+                : '<p class="no-reviews">Пока никто не оставил отзыв. Будьте первым!</p>';
+        }
+        function saveUser(user) {
+            localStorage.setItem('nexusbyte_user', JSON.stringify(user));
+            currentUser = user;
+            updateAuthWidget();
+            updateAvatarDisplay();
+            updateUserDisplay();
+        }
+        function updateAuthWidget() {
+            const widget = document.getElementById('auth-widget');
+            if (currentUser) {
+                widget.style.display = 'none';
+            } else {
+                widget.style.display = 'block';
+            }
+        }
+        function updateAvatarDisplay() {
+            const userWidget = document.querySelector('.user-widget');
+            const avatarImg = document.getElementById('user-avatar');
+            const profileAvatar = document.getElementById('profile-avatar');
+            const avatarPlaceholder = document.getElementById('avatar-placeholder');
+            if (currentUser) {
+                userWidget.style.display = 'flex';
+                if (currentUser.avatar) {
+                    avatarImg.src = currentUser.avatar;
+                    avatarImg.style.display = 'block';
+                    avatarPlaceholder.style.display = 'none';
+                } else {
+                    avatarImg.style.display = 'none';
+                    avatarPlaceholder.style.display = 'flex';
+                }
+                if (profileAvatar) {
+                    profileAvatar.src = currentUser.avatar || '';
+                    if (!currentUser.avatar) {
+                        profileAvatar.style.background = '#333';
+                        profileAvatar.style.color = '#666';
+                        profileAvatar.textContent = '👤';
+                    } else {
+                        profileAvatar.style.background = '';
+                        profileAvatar.style.color = '';
+                        profileAvatar.textContent = '';
+                    }
+                }
+            } else {
+                userWidget.style.display = 'none';
+            }
+        }
+        function updateUserDisplay() {
+            const displayNameHeader = document.getElementById('user-display');
+            const displayNameProfile = document.getElementById('user-display-profile');
+            if (currentUser && currentUser.username) {
+                displayNameHeader.textContent = currentUser.username;
+                displayNameHeader.style.display = 'block';
+                displayNameProfile.textContent = currentUser.username;
+                displayNameProfile.style.display = 'block';
+            } else {
+                displayNameHeader.style.display = 'none';
+                displayNameProfile.style.display = 'none';
+            }
+        }
+        function showProfilePage() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('profile-page').style.display = 'block';
+            // Скрываем ВЕСЬ интерфейс меню при входе в личный кабинет
+            document.querySelector('.header-menu').style.display = 'none';
+            document.getElementById('profile-phone').value = currentUser.phone || '';
+            document.getElementById('profile-address').value = currentUser.address || '';
+            document.getElementById('profile-pickup').value = currentUser.pickupPoint || '';
+            renderOrders();
+            renderCartPreview();
+        }
+        function showMainPage() {
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('profile-page').style.display = 'none';
+            document.getElementById('documentation').style.display = 'none';
+            // Показываем ВЕСЬ интерфейс меню при возврате на главную
+            document.querySelector('.header-menu').style.display = 'flex';
+        }
+        function renderOrders() {
+            const ordersContainer = document.getElementById('paid-orders');
+            if (!currentUser || !currentUser.orders || currentUser.orders.length === 0) {
+                ordersContainer.innerHTML = '<p style="text-align:center; opacity:0.7; margin:2rem 0;">Нет оплаченных заказов</p>';
+                return;
+            }
+            ordersContainer.innerHTML = currentUser.orders.map((order, idx) => {
+                const orderDate = new Date(order.timestamp);
+                const formattedDate = orderDate.toLocaleDateString('ru-RU');
+                const formattedTime = orderDate.toLocaleTimeString('ru-RU');
+                return `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <span>Заказ от ${formattedDate} ${formattedTime}</span>
+                            <span>₽${order.total.toLocaleString('ru-RU')}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Адрес:</strong> ${order.deliveryAddress}</p>
+                            <p><strong>Телефон:</strong> ${order.phone}</p>
+                            <p><strong>Товары:</strong> ${order.items.map(i => i.name + ' ×' + i.quantity).join(', ')}</p>
+                            <p><strong>Пункт выдачи:</strong> ${order.pickupPoint || 'Не указан'}</p>
+                        </div>
+                        <button class="btn cancel-order-btn" data-index="${idx}">Отменить заказ и вернуть средства</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        function renderCartPreview() {
+            const previewItems = document.getElementById('cart-preview-items');
+            const totalEl = document.getElementById('cart-preview-total');
+            if (cart.length === 0) {
+                previewItems.innerHTML = '<p>Корзина пуста</p>';
+                totalEl.textContent = 'Итого: ₽0';
+                document.getElementById('go-to-checkout').style.display = 'none';
+                return;
+            }
+            let html = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                html += `
+                    <div class="cart-preview-item">
+                        <div>${item.name} ×${item.quantity}</div>
+                        <div>₽${itemTotal.toLocaleString('ru-RU')}</div>
+                    </div>
+                `;
+            });
+            previewItems.innerHTML = html;
+            totalEl.textContent = `Итого: ₽${total.toLocaleString('ru-RU')}`;
+            document.getElementById('go-to-checkout').style.display = 'block';
+        }
+        function saveUsers(users) {
+            localStorage.setItem('nexusbyte_login_users', JSON.stringify(users));
+        }
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('nexusbyte_login_users')) || {};
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('products-container');
+            container.innerHTML = laptops.map(renderLaptop).join('');
+            renderAllReviews(); // Загружаем отзывы при загрузке страницы
+            updateCartUI();
+            updateAuthWidget();
+            updateAvatarDisplay();
+            updateUserDisplay();
+            showMainPage();
+            // Инициализация аккордеона
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                    const answer = item.nextElementSibling;
+                    if (answer.style.display === 'block') {
+                        answer.style.display = 'none';
+                        item.querySelector('.toggle').textContent = '+';
+                    } else {
+                        faqItems.forEach(otherItem => {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active');
+                                otherItem.nextElementSibling.style.display = 'none';
+                                otherItem.querySelector('.toggle').textContent = '+';
+                            }
+                        });
+                        answer.style.display = 'block';
+                        item.querySelector('.toggle').textContent = '-';
+                    }
+                });
+            });
+            // Обработчик кнопки "Задать свой вопрос"
+            document.getElementById('ask-question-btn').addEventListener('click', () => {
+                const form = document.getElementById('question-form');
+                form.style.display = form.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-to-cart')) {
+                const id = parseInt(e.target.dataset.id);
+                const laptop = laptops.find(l => l.id === id);
+                const existing = cart.find(item => item.id === id);
+                if (existing) {
+                    existing.quantity++;
+                } else {
+                    cart.push({ id: laptop.id, name: laptop.name, price: laptop.price, quantity: 1 });
+                }
+                saveCart();
+                alert(`Товар "${laptop.name}" добавлен в корзину!`);
+            }
+            if (e.target.classList.contains('btn-remove')) {
+                const index = parseInt(e.target.dataset.index);
+                cart.splice(index, 1);
+                saveCart();
+                renderCartModal();
+            }
+            if (e.target.id === 'open-login') {
+                document.getElementById('login-modal').style.display = 'flex';
+                isRegisterMode = false;
+                updateAuthForm();
+            }
+            if (e.target.id === 'close-cart') {
+                document.getElementById('cart-modal').style.display = 'none';
+            }
+            if (e.target.id === 'close-login') {
+                document.getElementById('login-modal').style.display = 'none';
+            }
+            if (e.target.id === 'close-recovery') {
+                document.getElementById('recovery-modal').style.display = 'none';
+                document.getElementById('recovery-result').style.display = 'none';
+            }
+            if (e.target.id === 'close-change-password') {
+                document.getElementById('change-password-modal').style.display = 'none';
+            }
+            if (e.target.id === 'close-support') {
+                document.getElementById('support-modal').style.display = 'none';
+                document.getElementById('support-result').style.display = 'none';
+            }
+            if (e.target.id === 'logout-btn') {
+                currentUser = null;
+                localStorage.removeItem('nexusbyte_user');
+                showMainPage();
+                updateAuthWidget();
+                updateAvatarDisplay();
+                updateUserDisplay();
+            }
+            if (e.target.id === 'back-to-catalog') {
+                showMainPage();
+            }
+            if (e.target.id === 'back-to-main') { // Обработчик для кнопки "назад" в документации
+                showMainPage();
+            }
+            if (e.target.id === 'show-recovery') {
+                e.preventDefault();
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('recovery-modal').style.display = 'flex';
+            }
+            if (e.target.id === 'change-password-btn') {
+                document.getElementById('change-password-modal').style.display = 'flex';
+            }
+            if (e.target.id === 'open-support') {
+                document.getElementById('support-modal').style.display = 'flex';
+            }
+            if (e.target.id === 'toggle-auth-mode') {
+                isRegisterMode = !isRegisterMode;
+                updateAuthForm();
+            }
+            if (e.target.id === 'change-avatar-btn') {
+                document.getElementById('avatar-input').click();
+            }
+            if (e.target.id === 'save-profile-btn') {
+                if (!currentUser) return;
+                const phone = document.getElementById('profile-phone').value.trim();
+                const address = document.getElementById('profile-address').value.trim();
+                const pickup = document.getElementById('profile-pickup').value.trim();
+                currentUser.phone = phone;
+                currentUser.address = address;
+                currentUser.pickupPoint = pickup;
+                saveUser(currentUser);
+                alert('Настройки сохранены!');
+                document.getElementById('delivery-address').value = address;
+                document.getElementById('phone-number').value = phone;
+                document.getElementById('pickup-point').value = pickup;
+            }
+            if (e.target.id === 'go-to-checkout') {
+                document.getElementById('cart-modal').style.display = 'flex';
+                renderCartModal();
+            }
+            if (e.target.classList.contains('cancel-order-btn')) {
+                const idx = parseInt(e.target.dataset.index);
+                if (!currentUser.orders || !currentUser.orders[idx]) return;
+                currentUser.orders.splice(idx, 1);
+                saveUser(currentUser);
+                alert('Заказ отменён. Средства возвращены.');
+                renderOrders();
+            }
+            if (e.target.id === 'user-avatar' || e.target.id === 'avatar-placeholder') {
+                if (currentUser) {
+                    showProfilePage();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                    isRegisterMode = false;
+                    updateAuthForm();
+                }
+            }
+            // Новый обработчик для ссылки "Документация"
+            if (e.target.getAttribute('href') === '#documentation') {
+                e.preventDefault();
+                document.getElementById('main-content').style.display = 'none';
+                document.getElementById('documentation').style.display = 'block';
+                // Скрываем ВЕСЬ интерфейс меню при переходе в документацию
+                document.querySelector('.header-menu').style.display = 'none';
+            }
+        });
+        document.getElementById('avatar-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file || !file.type.match('image.*')) {
+                alert('Пожалуйста, выберите изображение.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (currentUser) {
+                    currentUser.avatar = event.target.result;
+                    saveUser(currentUser);
+                    updateAvatarDisplay(); // Обновляем отображение после загрузки
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        function updateAuthForm() {
+            const title = document.getElementById('auth-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleText = document.getElementById('toggle-auth-mode');
+            if (isRegisterMode) {
+                title.textContent = 'Регистрация';
+                submitBtn.textContent = 'Зарегистрироваться';
+                toggleText.textContent = 'Уже есть аккаунт? Войти';
+            } else {
+                title.textContent = 'Вход в личный кабинет';
+                submitBtn.textContent = 'Войти';
+                toggleText.textContent = 'Нет аккаунта? Зарегистрироваться';
+            }
+        }
+        document.getElementById('auth-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value;
+            if (username.length < 3 || password.length < 6) {
+                alert('Логин должен содержать минимум 3 символа, пароль - минимум 6 символов');
+                return;
+            }
+            const users = getUsers();
+            if (isRegisterMode) {
+                if (users[username]) {
+                    alert('Пользователь с таким логином уже существует!');
+                    return;
+                }
+                users[username] = {
+                    password: btoa(password),
+                    orders: [],
+                    phone: '',
+                    address: '',
+                    pickupPoint: '',
+                    avatar: null
+                };
+                saveUsers(users);
+                saveUser({ username, orders: [], phone: '', address: '', pickupPoint: '', avatar: null });
+                alert('Регистрация успешна!');
+                document.getElementById('login-modal').style.display = 'none';
+                showProfilePage();
+            } else {
+                if (users[username]) {
+                    if (users[username].password === btoa(password)) {
+                        const user = users[username];
+                        saveUser({
+                            username: user.username || username,
+                            orders: user.orders || [],
+                            phone: user.phone || '',
+                            address: user.address || '',
+                            pickupPoint: user.pickupPoint || '',
+                            avatar: user.avatar
+                        });
+                        document.getElementById('login-modal').style.display = 'none';
+                        showProfilePage();
+                    } else {
+                        alert('Неверный пароль!');
+                    }
+                } else {
+                    alert('Пользователь не найден!');
+                }
+            }
+        });
+        document.getElementById('cart-trigger').addEventListener('click', () => {
+            document.getElementById('cart-modal').style.display = 'flex';
+            renderCartModal();
+        });
+        document.getElementById('checkout-btn').addEventListener('click', function() {
+            if (cart.length === 0) {
+                alert('Корзина пуста!');
+                return;
+            }
+            const address = document.getElementById('delivery-address').value.trim();
+            const phone = document.getElementById('phone-number').value.trim();
+            const pickupPoint = document.getElementById('pickup-point').value.trim();
+            if (!address || !phone || !pickupPoint) {
+                alert('Заполните все поля: Адрес, Телефон, Пункт выдачи.');
+                return;
+            }
+            if (!currentUser) {
+                alert('Войдите в личный кабинет.');
+                return;
+            }
+            window.location.href = 'https://www.donationalerts.com/r/bolenpsixi4ecski';
+        });
+        // Обработчик формы общего отзыва
+        document.getElementById('global-review-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const author = document.getElementById('review-author-global').value.trim();
+            const text = document.getElementById('review-text-global').value.trim();
+            if (!author || !text) {
+                alert('Пожалуйста, заполните все поля: Имя и Отзыв.');
+                return;
+            }
+            const reviews = loadReviews();
+            if (!reviews['site']) {
+                reviews['site'] = [];
+            }
+            reviews['site'].push({ author, text });
+            saveReviews(reviews);
+            document.getElementById('global-review-form').reset();
+            renderAllReviews(); // Вызов функции для обновления отображения
+            alert('Спасибо за ваш отзыв о сайте!');
+        });
+    </script>
+</body>
+</html>
